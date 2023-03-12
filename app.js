@@ -75,6 +75,8 @@ io.on('connection', (socket) => {
 
     socket.on('orientation', (data) => {
 
+        console.log(socket.pcId);
+        console.log('x: ' + data.x + ' y: ' + data.y);
         let player = players[findPlayerIndex(socket.pcId)];
         let vel = new Vector(data.x , data.y);
         vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
