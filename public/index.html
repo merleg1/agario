@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>agario</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="libraries/p5.js"></script>
+  <script src="libraries/qrcode.js"></script>
+</head>
+
+<body>
+  <div id="overlay">
+    <div class="form-container">
+      <h1 class="title">agario</h1>
+      <label for="nickname"><b>Nickname</b></label>
+      <input type="text" placeholder="Enter Nickname" name="nickname" id="nickname" maxlength="10">
+      <div class="qrcode-outer">
+        <label for="qrcode"><b>Scan QR-Code on Phone</b></label>
+        <div id="qrcode" name="qrcode"></div>
+      </div>
+      <button class="btn" onclick="startGame();">Play</button>
+      </form>
+    </div>
+    <script src="sketch.js"></script>
+</body>
+
+</html>
