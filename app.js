@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const url = 'https://agario-4g6i.onrender.com/';
+const url = 'https://agario-4g6i.onrender.com';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
