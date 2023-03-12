@@ -56,11 +56,11 @@ io.on('connection', (socket) => {
     socket.on('registerPhoneToPC', (data) => {
         console.log(data + " is paired with " + socket.id)
         idPairs.push({ pcId: data, phoneId: socket.id });
-    });
 
-    if(findPlayerIndex(getPcId(socket.id)) != null) {
-        socket.emit('startPhone');
-    }
+        if(findPlayerIndex(data) != null) {
+            socket.emit('startPhone');
+        }
+    });
 
     socket.on('start', (data) => {
         let phoneId = getPhoneId(socket.id);
