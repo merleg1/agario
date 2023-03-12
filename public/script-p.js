@@ -37,7 +37,7 @@ function handleOrientation(event) {
   if (ox > 90) {
     ox = 90;
   }
-  if (x < -90) {
+  if (ox < -90) {
     ox = -90;
   }
 }
