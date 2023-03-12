@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const url = 'http://192.168.1.115:3000';
+const url = 'https://agario-4g6i.onrender.com';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -125,7 +125,7 @@ io.on('connection', (socket) => {
 
 });
 
-server.listen(port, '192.168.1.115', () => {
+server.listen(port, () => {
     console.log(`App listening on port ${port}`)
 })
 
