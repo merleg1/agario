@@ -5,3 +5,20 @@ body {
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
 }
+
+.text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 60px;
+    width: 140px;
+    height: 500px;
+
+
+}
