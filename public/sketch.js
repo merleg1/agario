@@ -51,10 +51,15 @@ function setup() {
     });
   });
 
+  socket.on('noPair', () => {
+    document.getElementById("phoneError").style.display = "block";
+  });
+
   socket.on('startReturn', (data) => {
     actualHeight = data.h;
     actualWidth = data.w;
     blobStartSize = data.s;
+    document.getElementById("overlay").style.display = "none";
     start = true;
   });
 }
@@ -100,7 +105,6 @@ function isInWindow(x, y, px, py, cw, ch) {
 
 function startGame() {
   let nickname = document.getElementById("nickname").value;
-  document.getElementById("overlay").style.display = "none";
 
   socket.emit('start', {
     w: width,

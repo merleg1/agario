@@ -18,6 +18,10 @@
   <div id="overlay">
     <div class="form-container">
       <h1 class="title">agario</h1>
+      <div class="alert" id="phoneError">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <strong>Error! </strong> No Phone Connected
+      </div>
       <label for="nickname"><b>Nickname</b></label>
       <input type="text" placeholder="Enter Nickname" name="nickname" id="nickname" maxlength="10">
       <div class="qrcode-outer">

@@ -1,5 +1,6 @@
 const port = process.env.PORT || 3000;
 const url = 'https://agario-4g6i.onrender.com';
+// const url = 'http://192.168.1.115:3000';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -54,71 +55,96 @@ io.on('connection', (socket) => {
 
     socket.on('registerPhoneToPC', (data) => {
         console.log(data + " is paired with " + socket.id)
-        idPairs.push({pcId: data, phoneId: socket.id});
+        idPairs.push({ pcId: data, phoneId: socket.id });
     });
 
+    if(findPlayerIndex(getPcId(socket.id)) != null) {
+        socket.emit('startPhone');
+    }
+
     socket.on('start', (data) => {
-        let player = new Player(data.n != '' ? data.n : 'blob', getRandomInt(-actualWidth / 2, actualWidth / 2), getRandomInt(-actualHeight / 2, actualHeight / 2), blobStartSize, socket.id, data.w, data.h);
-        players.push(player);
-
-        socket.emit('playerData', player);
-
-        socket.emit('foodData', food);
-
-        socket.emit('startReturn', {
-            h: actualHeight,
-            w: actualWidth,
-            s: blobStartSize
-        });
-
         let phoneId = getPhoneId(socket.id);
-        console.log("send startPhone to: " + phoneId)
+        if (phoneId != null) {
+            let player = new Player(data.n != '' ? data.n : 'blob', getRandomInt(-actualWidth / 2, actualWidth / 2), getRandomInt(-actualHeight / 2, actualHeight / 2), blobStartSize, socket.id, data.w, data.h);
+            players.push(player);
 
-        io.to(phoneId).emit('startPhone');
+            socket.emit('playerData', player);
+
+            socket.emit('foodData', food);
+
+            socket.emit('startReturn', {
+                h: actualHeight,
+                w: actualWidth,
+                s: blobStartSize
+            });
+
+            console.log("send startPhone to: " + phoneId)
+            io.to(phoneId).emit('startPhone');
+        }
+
+        else {
+            socket.emit('noPair');
+
+        }
 
     });
 
     socket.on('orientation', (data) => {
 
         let pcId = getPcId(socket.id);
-        let player = players[findPlayerIndex(pcId)];
-        let vel = new Vector(data.x , data.y);
-        vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
-        player.move(vel, (actualWidth / 2) - player.r, (actualHeight / 2) - player.r);
+        if (pcId != null) {
+            let index = findPlayerIndex(pcId);
+            if (index != null) {
+                let player = players[index];
+                let vel = new Vector(data.x, data.y);
+                vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
+                player.move(vel, (actualWidth / 2) - player.r, (actualHeight / 2) - player.r);
 
-        for (var i = 0; i < food.length; i++) {
-            if (player.eats(food[i])) {
-                eatenFoodIndices.push(i);
-                numberOfEatenBlobs++;
-                food.splice(i, 1);
+                for (var i = 0; i < food.length; i++) {
+                    if (player.eats(food[i])) {
+                        eatenFoodIndices.push(i);
+                        numberOfEatenBlobs++;
+                        food.splice(i, 1);
+                    }
+                }
+
+                for (var i = 0; i < players.length; i++) {
+                    if (players[i].id != player.id && player.eats(players[i])) {
+                        console.log("player " + players[i].id + " has been eaten");
+                        players[i].pos.x = getRandomInt(-actualWidth / 2, actualWidth / 2);
+                        players[i].pos.y = getRandomInt(-actualHeight / 2, actualHeight / 2);
+                        players[i].r = blobStartSize;
+                        io.to(players[i].id).emit('player', players[i]);
+                    }
+                }
+
+                io.emit('eatenFood', eatenFoodIndices);
+                eatenFoodIndices = [];
             }
         }
-
-        for (var i = 0; i < players.length; i++) {
-            if (players[i].id != player.id && player.eats(players[i])) {
-                console.log("player " + players[i].id + " has been eaten");
-                players[i].pos.x = getRandomInt(-actualWidth / 2, actualWidth / 2);
-                players[i].pos.y = getRandomInt(-actualHeight / 2, actualHeight / 2);
-                players[i].r = blobStartSize;
-                io.to(players[i].id).emit('player', players[i]);
-            }
-        }
-
-        io.emit('eatenFood', eatenFoodIndices);
-        eatenFoodIndices = [];
-
     });
 
     socket.on('getPositions', () => {
-        let player = players[findPlayerIndex(socket.id)];
-        socket.emit('playerData', player);
-        socket.emit('players', players);
+        let i = findPlayerIndex(socket.id);
+        if (i != null) {
+            let player = players[i];
+            socket.emit('playerData', player);
+            socket.emit('players', players);
+        }
     });
 
     socket.on('disconnect', () => {
         console.log(socket.id, "has disconnected");
+        if(getPhoneId(socket.id) != null) {
+            socket.emit('stopPhone');
+        }
+        removeIdConnection(socket.id);
 
-        players.splice(findPlayerIndex(socket.id), 1);
+        let i = findPlayerIndex(socket.id)
+        if (i != null) {
+            players.splice(i, 1);
+
+        }
     });
 
 });
@@ -142,6 +168,7 @@ function findPlayerIndex(id) {
         index++;
 
     }
+    return null;
 }
 
 function getPhoneId(pcId) {
@@ -150,12 +177,22 @@ function getPhoneId(pcId) {
             return idPair.phoneId;
         }
     }
+    return null;
 }
 
 function getPcId(phoneId) {
     for (idPair of idPairs) {
         if (idPair.phoneId == phoneId) {
             return idPair.pcId;
+        }
+    }
+    return null;
+}
+
+function removeIdConnection(id) {
+    for (var i = 0; i < idPairs.length; i++) {
+        if (idPairs[i].pcId == id || idPairs[i].phoneId == id) {
+            idPairs.splice(i, 1);
         }
     }
 }
