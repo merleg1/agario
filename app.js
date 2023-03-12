@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const url = 'https://agario-4g6i.onrender.com/';
+const url = 'https://agario-4g6i.onrender.com';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -51,6 +51,9 @@ io.on('connection', (socket) => {
         socket.emit('initReturn', `${url}/phone?id=${socket.id}`);
     });
 
+    socket.on('registerPhoneToPC', (data) => {
+        socket.pcId = data;
+    });
 
     socket.on('start', (data) => {
         let player = new Player(data.n != '' ? data.n : 'blob', getRandomInt(-actualWidth / 2, actualWidth / 2), getRandomInt(-actualHeight / 2, actualHeight / 2), blobStartSize, socket.id, data.w, data.h);
@@ -66,40 +69,40 @@ io.on('connection', (socket) => {
             s: blobStartSize
         });
 
+        socket.emit('startPhone');
+
     });
 
     socket.on('orientation', (data) => {
 
-        console.log('orientation: ' + data.x + ', ' + data.y);
+        let player = players[findPlayerIndex(socket.pcId)];
+        let vel = new Vector(data.x , data.y);
+        vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
+        player.move(vel, (actualWidth / 2) - player.r, (actualHeight / 2) - player.r);
 
-        // let player = players[findPlayerIndex(socket.id)];
-        // let vel = new Vector(data.x - player.canvasWidth / 2, data.y - player.canvasHeight / 2);
-        // vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
-        // player.move(vel, (actualWidth / 2) - player.r, (actualHeight / 2) - player.r);
+        for (var i = 0; i < food.length; i++) {
+            if (player.eats(food[i])) {
+                eatenFoodIndices.push(i);
+                numberOfEatenBlobs++;
+                food.splice(i, 1);
+            }
+        }
 
-        // for (var i = 0; i < food.length; i++) {
-        //     if (player.eats(food[i])) {
-        //         eatenFoodIndices.push(i);
-        //         numberOfEatenBlobs++;
-        //         food.splice(i, 1);
-        //     }
-        // }
+        for (var i = 0; i < players.length; i++) {
+            if (players[i].id != player.id && player.eats(players[i])) {
+                console.log("player " + players[i].id + " has been eaten");
+                players[i].pos.x = getRandomInt(-actualWidth / 2, actualWidth / 2);
+                players[i].pos.y = getRandomInt(-actualHeight / 2, actualHeight / 2);
+                players[i].r = blobStartSize;
+                io.to(players[i].id).emit('player', players[i]);
+            }
+        }
 
-        // for (var i = 0; i < players.length; i++) {
-        //     if (players[i].id != player.id && player.eats(players[i])) {
-        //         console.log("player " + players[i].id + " has been eaten");
-        //         players[i].pos.x = getRandomInt(-actualWidth / 2, actualWidth / 2);
-        //         players[i].pos.y = getRandomInt(-actualHeight / 2, actualHeight / 2);
-        //         players[i].r = blobStartSize;
-        //         io.to(players[i].id).emit('player', players[i]);
-        //     }
-        // }
+        io.to(socket.pcId).emit('playerData', player);
 
-        // socket.emit('playerData', player);
-
-        // socket.emit('players', players);
-        // io.emit('eatenFood', eatenFoodIndices);
-        // eatenFoodIndices = [];
+        io.to(socket.pcId).emit('players', players);
+        io.emit('eatenFood', eatenFoodIndices);
+        eatenFoodIndices = [];
 
     });
 
