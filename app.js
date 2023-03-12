@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
     console.log('New connection from ' + socket.id);
 
     socket.on('init', () => {
-        socket.emit('initReturn', `${url}:${port}/phone?id=${socket.id}`);
+        socket.emit('initReturn', `${url}/phone?id=${socket.id}`);
     });
 
 
@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
 
 });
 
-server.listen(port,  () => {
+server.listen(port, () => {
     console.log(`App listening on port ${port}`)
 })
 
