@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const url = 'https://agario-4g6i.onrender.com';
+const url = 'http://192.168.1.115:3000';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -24,6 +24,7 @@ app.get('/phone', function (req, res) {
     res.sendFile(__dirname + '/public/index-p.html');
 });
 
+let idPairs = [];
 let players = [];
 let food = [];
 let eatenFoodIndices = [];
@@ -52,7 +53,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('registerPhoneToPC', (data) => {
-        socket.pcId = data;
+        console.log(data + " is paired with " + socket.id)
+        idPairs.push({pcId: data, phoneId: socket.id});
     });
 
     socket.on('start', (data) => {
@@ -69,7 +71,10 @@ io.on('connection', (socket) => {
             s: blobStartSize
         });
 
-        socket.emit('startPhone');
+        let phoneId = getPhoneId(socket.id);
+        console.log("send startPhone to: " + phoneId)
+
+        io.to(phoneId).emit('startPhone');
 
     });
 
@@ -77,7 +82,8 @@ io.on('connection', (socket) => {
 
         console.log(socket.pcId);
         console.log('x: ' + data.x + ' y: ' + data.y);
-        let player = players[findPlayerIndex(socket.pcId)];
+        let pcId = getPcId(socket.id);
+        let player = players[findPlayerIndex(pcId)];
         let vel = new Vector(data.x , data.y);
         vel.setMag(2.2 * Math.pow(player.r, -0.439) * 40);
         player.move(vel, (actualWidth / 2) - player.r, (actualHeight / 2) - player.r);
@@ -100,12 +106,15 @@ io.on('connection', (socket) => {
             }
         }
 
-        io.to(socket.pcId).emit('playerData', player);
-
-        io.to(socket.pcId).emit('players', players);
         io.emit('eatenFood', eatenFoodIndices);
         eatenFoodIndices = [];
 
+    });
+
+    socket.on('getPositions', () => {
+        let player = players[findPlayerIndex(socket.id)];
+        socket.emit('playerData', player);
+        socket.emit('players', players);
     });
 
     socket.on('disconnect', () => {
@@ -116,7 +125,7 @@ io.on('connection', (socket) => {
 
 });
 
-server.listen(port, () => {
+server.listen(port, '192.168.1.115', () => {
     console.log(`App listening on port ${port}`)
 })
 
@@ -134,6 +143,22 @@ function findPlayerIndex(id) {
 
         index++;
 
+    }
+}
+
+function getPhoneId(pcId) {
+    for (idPair of idPairs) {
+        if (idPair.pcId == pcId) {
+            return idPair.phoneId;
+        }
+    }
+}
+
+function getPcId(phoneId) {
+    for (idPair of idPairs) {
+        if (idPair.phoneId == phoneId) {
+            return idPair.pcId;
+        }
     }
 }
 

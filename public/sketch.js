@@ -64,6 +64,8 @@ function draw() {
   background(15);
 
   if (start) {
+
+    socket.emit('getPositions');
     translate(width / 2, height / 2);
     let newzoom = blobStartSize / player.r;
     //making the transition animations smoother lerp funtion
