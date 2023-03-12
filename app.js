@@ -1,4 +1,5 @@
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || 'localhost';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -10,6 +11,8 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+
+
 
 app.use(express.static('public'));
 
@@ -45,7 +48,7 @@ io.on('connection', (socket) => {
     console.log('New connection from ' + socket.id);
 
     socket.on('init', () => {
-        socket.emit('initReturn', `${process.env.PUBLIC_URL}:${port}/phone?id=${socket.id}`);
+        socket.emit('initReturn', `${host}:${port}/phone?id=${socket.id}`);
     });
 
 
