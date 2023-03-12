@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const url = 'https://agario-4g6i.onrender.com';
+const url = 'https://agario-4g6i.onrender.com/';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -80,8 +80,6 @@ io.on('connection', (socket) => {
 
     socket.on('orientation', (data) => {
 
-        console.log(socket.pcId);
-        console.log('x: ' + data.x + ' y: ' + data.y);
         let pcId = getPcId(socket.id);
         let player = players[findPlayerIndex(pcId)];
         let vel = new Vector(data.x , data.y);
