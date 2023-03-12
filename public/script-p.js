@@ -32,7 +32,7 @@ function draw() {
 
 function handleOrientation(event) {
   ox = event.beta; // In degree in the range [-180,180)
-  oy = -event.gamma; // In degree in the range [-90,90)
+  oy = event.gamma; // In degree in the range [-90,90)
 
   if (ox > 90) {
     ox = 90;
