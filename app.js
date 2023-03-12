@@ -1,5 +1,5 @@
 const port = process.env.PORT || 3000;
-const host = process.env.HOST || 'localhost';
+const url = 'https://agario-4g6i.onrender.com/';
 const Vector = require('./vector.js')
 const Blob = require('./blob.js')
 const Player = require('./player.js')
@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
     console.log('New connection from ' + socket.id);
 
     socket.on('init', () => {
-        socket.emit('initReturn', `${host}:${port}/phone?id=${socket.id}`);
+        socket.emit('initReturn', `${url}:${port}/phone?id=${socket.id}`);
     });
 
 
