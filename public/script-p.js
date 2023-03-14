@@ -35,6 +35,11 @@ function draw() {
 
 function handleOrientation(event) {
 
+  if(!handleOrientationCalled) {
+    handleOrientationCalled = true;
+    btn.style.display = "none";
+  }
+
   ox = event.beta; // In degree in the range [-180,180)
   oy = -event.gamma; // In degree in the range [-90,90)
 
@@ -52,7 +57,6 @@ function permission() {
       .then(response => {
         if (response == "granted") {
           window.addEventListener("deviceorientation", handleOrientation);
-          btn.style.display = "none";
         }
       })
       .catch(console.error)
@@ -77,12 +81,7 @@ socket.on('stopPhone', () => {
   start = false;
 });
 
-if(window.DeviceOrientationEvent) {
-  window.addEventListener("deviceorientation", handleOrientation);
-  btn.style.display = "none";
-}
-else {
-  btn.addEventListener("click", permission);
-}
+window.addEventListener("deviceorientation", handleOrientation);
+btn.addEventListener("click", permission);
 
 draw();
