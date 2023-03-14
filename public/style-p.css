@@ -22,3 +22,16 @@ body {
 
 
 }
+
+.btn {
+    background-color: #e7e7e7;
+    color: #000000;
+    padding: 16px 20px;
+    border: none;
+    margin: 8px;
+    opacity: 0.8;
+}
+
+.btn:focus {
+    opacity: 1;
+}

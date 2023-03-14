@@ -10,6 +10,9 @@ let pcId = null;
 let ox;
 let oy;
 let start = false;
+let handleOrientationCalled = false;
+
+let btn = document.getElementById("request");
 
 function draw() {
 
@@ -31,6 +34,7 @@ function draw() {
 }
 
 function handleOrientation(event) {
+
   ox = event.beta; // In degree in the range [-180,180)
   oy = -event.gamma; // In degree in the range [-90,90)
 
@@ -39,6 +43,21 @@ function handleOrientation(event) {
   }
   if (ox < -90) {
     ox = -90;
+  }
+}
+
+function permission() {
+  if (typeof (DeviceOrientationEvent) !== "undefined" && typeof (DeviceOrientationEvent.requestPermission) === "function") {
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response == "granted") {
+          window.addEventListener("deviceorientation", handleOrientation);
+          btn.style.display = "none";
+        }
+      })
+      .catch(console.error)
+  } else {
+    alert("DeviceOrientationEvent is not defined");
   }
 }
 
@@ -58,6 +77,12 @@ socket.on('stopPhone', () => {
   start = false;
 });
 
-window.addEventListener("deviceorientation", handleOrientation);
+if(window.DeviceOrientationEvent) {
+  window.addEventListener("deviceorientation", handleOrientation);
+  btn.style.display = "none";
+}
+else {
+  btn.addEventListener("click", permission);
+}
 
 draw();
