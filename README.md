@@ -11,3 +11,6 @@ https://agario-4g6i.onrender.com/
 3. Connect your phone by scanning the QR-Code
 4. Press play
 5. Now you can move your blob by tilting the phone
+
+# Architecture diagram
+![arch](https://user-images.githubusercontent.com/91537937/225055448-79d42296-c0ba-4f5a-af3d-7a303e17bb77.png)
