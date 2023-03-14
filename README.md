@@ -14,3 +14,6 @@ https://agario-4g6i.onrender.com/
 
 # Architecture diagram
 ![arch](https://user-images.githubusercontent.com/91537937/225055448-79d42296-c0ba-4f5a-af3d-7a303e17bb77.png)
+
+# Sequence diagram
+![seq](https://user-images.githubusercontent.com/91537937/225064172-236e4fa6-3dab-4658-96ec-2493eb265a59.png)
