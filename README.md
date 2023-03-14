@@ -2,7 +2,7 @@
 
 Agario web game, which you can open on your pc and connect your phone. After starting the game you can move your blob by tilting your phone in the corresponding direction. The project was done using node.js, express, socket.io, p5.js and javascript. It was done during 2 Weeks in the studio UxWebmobile2. 
 
-#### Hosted via render at 
+### Hosted via render at 
 https://agario-4g6i.onrender.com/
 
 # How to play?
